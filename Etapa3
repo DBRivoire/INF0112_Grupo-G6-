@@ -1,1 +1,213 @@
+//Produto
+
+package model;
+
+public class Produto {
+    private String nome;
+    private double precoCusto;
+    private double precoVenda;
+    private int quantidadeEstoque;
+
+    public Produto(String nome, double precoCusto, double precoVenda, int quantidadeEstoque) {
+
+        if (nome == null || nome.trim().isEmpty()) {
+            throw new IllegalArgumentException("O nome do produto não pode ser vazio.");
+        }
+        if (precoCusto <= 0 || precoVenda <= 0) {
+            throw new IllegalArgumentException("Os preços devem ser maiores que zero.");
+        }
+        if (quantidadeEstoque < 0) {
+            throw new IllegalArgumentException("A quantidade em estoque não pode ser negativa.");
+        }
+
+        this.nome = nome;
+        this.precoCusto = precoCusto;
+        this.precoVenda = precoVenda;
+        this.quantidadeEstoque = quantidadeEstoque;
+    }
+
+    public void atualizarPreco(double novoPreco) {
+        if (novoPreco <= 0) {
+            throw new IllegalArgumentException("O preço deve ser maior que zero.");
+        }
+        this.precoVenda = novoPreco;
+    }
+
+
+    public void atualizarEstoque(int quantidade) {
+        if (this.quantidadeEstoque + quantidade < 0) {
+            throw new IllegalArgumentException("Estoque insuficiente para essa operação.");
+        }
+        this.quantidadeEstoque += quantidade;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Produto: " + nome +
+                "\nPreço de Custo: R$ " + precoCusto +
+                "\nPreço de Venda: R$ " + precoVenda +
+                "\nQuantidade em Estoque: " + quantidadeEstoque;
+    }
+
+
+    // Getters e setters
+
+     public String getNome() {
+         return nome;
+     }
+
+    public double getPrecoCusto() {
+        return precoCusto;
+    }
+
+    public double getPrecoVenda() {
+        return precoVenda;
+    }
+
+    public int getQuantidadeEstoque() {
+        return quantidadeEstoque;
+    }
+
+    // Setter apenas para o nome, caso necessário
+    public void setNome(String nome) {
+        if (nome == null || nome.trim().isEmpty()) {
+            throw new IllegalArgumentException("O nome do produto não pode ser vazio.");
+        }
+        this.nome = nome;
+    }
+
+    public void setPrecoCusto(double precoCusto) {
+        this.precoCusto = precoCusto;
+    }
+
+    public void setPrecoVenda(double precoVenda) {
+        this.precoVenda = precoVenda;
+    }
+
+
+
+}
+
+// ItemVenda
+
+package model;
+
+    public class ItemVenda {
+        private Produto produto;
+        private int quantidade; // quantidade de venda do produto
+
+
+    public ItemVenda( Produto produto, int quantidade) {
+    this.produto = produto;
+    this.quantidade = quantidade;
+    }
+
+
+    //Métodos
+
+    // Calcula o total do item (preço de venda * quantidade)
+    public double calcularTotal() {
+        return produto.getPrecoVenda() * quantidade;
+    }
+
+        // Getters e Setters
+        public Produto getProduto() {
+            return produto;
+        }
+
+        public void setProduto(Produto produto) {
+            this.produto = produto;
+        }
+
+        public int getQuantidade() {
+            return quantidade;
+        }
+
+        public void setQuantidade(int quantidade) {
+            this.quantidade = quantidade;
+        }
+
+        @Override
+        public String toString() {
+            return "ItemVenda{" +
+                    "produto=" + produto.getNome() +
+                    ", quantidade=" + quantidade +
+                    ", total=R$ " + calcularTotal() +
+                    '}';
+        }
+
+    }
+
+// Venda
+
+package model;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class Venda {
+    private int idVenda; // Identificação única da venda
+    private Date dataVenda; // Data em que a venda foi realizada
+    private List<ItemVenda> itens; // Lista de itens vendidos
+    private double totalVenda; // Total da venda (calculado dinamicamente)
+
+    // Construtor
+    public Venda(int idVenda, Date dataVenda) {
+        this.idVenda = idVenda;
+        this.dataVenda = dataVenda;
+        this.itens = new ArrayList<>();
+        this.totalVenda = 0.0;
+    }
+
+    // Adiciona um item à lista de itens da venda
+    public void adicionarItem(ItemVenda item) {
+        itens.add(item);
+        calcularTotalVenda(); // Recalcula o total da venda sempre que um item é adicionado
+    }
+
+    // Calcula o total da venda somando os totais de todos os itens
+    private void calcularTotalVenda() {
+        totalVenda = 0.0;
+        for (ItemVenda item : itens) {
+            totalVenda += item.calcularTotal();
+        }
+    }
+
+    // Getters
+    public int getIdVenda() {
+        return idVenda;
+    }
+
+    public Date getDataVenda() {
+        return dataVenda;
+    }
+
+    public List<ItemVenda> getItens() {
+        return itens;
+    }
+
+    public double getTotalVenda() {
+        return totalVenda;
+    }
+
+    // Método para exibir detalhes da venda
+    @Override
+    public String toString() {
+        StringBuilder detalhes = new StringBuilder();
+        detalhes.append("Venda ID: ").append(idVenda).append("\n");
+        detalhes.append("Data: ").append(dataVenda).append("\n");
+        detalhes.append("Itens Vendidos:\n");
+
+        for (ItemVenda item : itens) {
+            detalhes.append(item.toString()).append("\n");
+        }
+
+        detalhes.append("Total da Venda: R$ ").append(totalVenda);
+        return detalhes.toString();
+    }
+}
+
+
 
