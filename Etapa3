@@ -1,1 +1,15 @@
+package controller;
 
+import view.LoginPage;
+
+import javax.swing.*;
+
+public class Etapa3 {
+    public static LoginPage loginPage = new LoginPage();
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            loginPage.setVisible(true);
+        });
+    }
+}
