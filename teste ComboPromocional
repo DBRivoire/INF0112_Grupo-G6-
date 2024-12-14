@@ -1,0 +1,117 @@
+package Testes;
+
+import model.ComboPromocional;
+import model.Produto;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Arrays;
+
+
+public class teste_ComboPromocional {
+
+
+    @Test
+    public void testCalcularPrecoComboComDesconto() {
+        Produto produto1 = new Produto("Produto A", 10.0, 20.0, 5);
+        Produto produto2 = new Produto("Produto B", 15.0, 30.0, 3);
+        ComboPromocional combo = new ComboPromocional(Arrays.asList(produto1, produto2), 10.0);
+
+        double precoEsperado = (20.0 + 30.0) - ((20.0 + 30.0) * 0.10); // 50.0 - 5.0 = 45.0
+        assertEquals(precoEsperado, combo.calcularPrecoCombo());
+    }
+
+    @Test
+    public void testCalcularPrecoComboComDescontoZero() {
+        Produto produto1 = new Produto("Produto A", 10.0, 20.0, 5);
+        Produto produto2 = new Produto("Produto B", 15.0, 30.0, 3);
+        ComboPromocional combo = new ComboPromocional(Arrays.asList(produto1, produto2), 0.0);
+
+        double precoEsperado = 20.0 + 30.0; // Nenhum desconto, preço total é 50.0
+        assertEquals(precoEsperado, combo.calcularPrecoCombo());
+    }
+
+    @Test
+    public void testCalcularPrecoComboComDescontoAcimaDeCem() {
+        Produto produto1 = new Produto("Produto A", 10.0, 20.0, 5);
+        Produto produto2 = new Produto("Produto B", 15.0, 30.0, 3);
+        ComboPromocional combo = new ComboPromocional(Arrays.asList(produto1, produto2), 150.0);
+
+        // Se o desconto for maior que 100%, o preço total deve ser zero ou negativo
+        double precoEsperado = 0.0;
+        assertTrue(combo.calcularPrecoCombo() <= 0);
+    }
+
+    @Test
+    public void testComboPromocionalSemProdutos() {
+        // Teste para o caso de combo sem produtos
+        ComboPromocional combo = new ComboPromocional(Arrays.asList(), 10.0);
+
+        // Preço esperado será 0, pois não há produtos no combo
+        assertEquals(0.0, combo.calcularPrecoCombo());
+    }
+
+    @Test
+    public void testProdutoComNomeVazio() {
+        // Teste para produto com nome inválido (vazio)
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new Produto("", 10.0, 20.0, 5);
+        });
+        assertEquals("O nome do produto não pode ser vazio.", exception.getMessage());
+    }
+
+    @Test
+    public void testProdutoComPrecoVendaZero() {
+        // Teste para produto com preço de venda inválido (zero)
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new Produto("Produto A", 10.0, 0.0, 5);
+        });
+        assertEquals("Os preços devem ser maiores que zero.", exception.getMessage());
+    }
+
+    @Test
+    public void testProdutoComQuantidadeEstoqueNegativa() {
+        // Teste para produto com quantidade em estoque negativa
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            new Produto("Produto A", 10.0, 20.0, -1);
+        });
+        assertEquals("A quantidade em estoque não pode ser negativa.", exception.getMessage());
+    }
+
+    @Test
+    public void testAtualizarPrecoProdutoComPrecoInvalido() {
+        Produto produto = new Produto("Produto A", 10.0, 20.0, 5);
+
+        // Teste para atualizar preço com valor inválido (zero)
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            produto.atualizarPreco(0.0);
+        });
+        assertEquals("O preço deve ser maior que zero.", exception.getMessage());
+    }
+
+    @Test
+    public void testAtualizarEstoqueProdutoComQuantidadeInvalida() {
+        Produto produto = new Produto("Produto A", 10.0, 20.0, 5);
+
+        // Teste para atualizar estoque com quantidade que resulta em estoque negativo
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            produto.atualizarEstoque(-10); // Isso não é possível, pois o estoque atual é 5
+        });
+        assertEquals("Estoque insuficiente para essa operação.", exception.getMessage());
+    }
+
+    @Test
+    public void testToString() {
+        Produto produto1 = new Produto("Produto A", 10.0, 20.0, 5);
+        Produto produto2 = new Produto("Produto B", 15.0, 30.0, 3);
+        ComboPromocional combo = new ComboPromocional(Arrays.asList(produto1, produto2), 10.0);
+
+        String expectedString = "Combo Promocional:\n" +
+                "- Produto A: R$ 20.0\n" +
+                "- Produto B: R$ 30.0\n" +
+                "Desconto: 10.0%\n" +
+                "Preço com desconto: R$ 45.0\n";
+
+        assertEquals(expectedString, combo.toString());
+    }
+}
