@@ -1,0 +1,76 @@
+package main;
+
+import model.*;
+import service.*;
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        System.out.println("=== TESTES DO SISTEMA DA CAFETERIA ===\n");
+
+        // --- Teste Produto ---
+        System.out.println("1. TESTE DA CLASSE PRODUTO");
+        Produto cafe = new Produto("Café Espresso", 2.0, 5.0, 100);
+        Produto bolo = new Produto("Bolo de Cenoura", 3.0, 8.0, 50);
+
+        System.out.println(cafe);
+        System.out.println(bolo);
+        cafe.atualizarEstoque(-10);
+        System.out.println("Estoque após venda de 10 unidades: " + cafe.getQuantidadeEstoque() + "\n");
+
+        // --- Teste ItemVenda ---
+        System.out.println("2. TESTE DA CLASSE ITEMVENDA");
+        ItemVenda item1 = new ItemVenda(cafe, 2); // 2 unidades de café
+        ItemVenda item2 = new ItemVenda(bolo, 1); // 1 bolo
+
+        System.out.println(item1);
+        System.out.println(item2);
+        System.out.println();
+
+        // --- Teste Venda ---
+        System.out.println("3. TESTE DA CLASSE VENDA");
+        Venda venda1 = new Venda(1, new Date());
+        venda1.adicionarItem(item1);
+        venda1.adicionarItem(item2);
+
+        System.out.println(venda1);
+        System.out.println();
+
+        // --- Teste ComboPromocional ---
+        System.out.println("4. TESTE DA CLASSE COMBOPROMOCIONAL");
+        List<Produto> comboProdutos = new ArrayList<>();
+        comboProdutos.add(cafe);
+        comboProdutos.add(bolo);
+
+        ComboPromocional combo = new ComboPromocional(comboProdutos, 10); // 10% de desconto
+        System.out.println(combo);
+        System.out.println();
+
+        // --- Teste Estoque ---
+        System.out.println("5. TESTE DA CLASSE ESTOQUE");
+        Estoque estoque = new Estoque();
+        estoque.adicionarProduto(cafe);
+        estoque.adicionarProduto(bolo);
+
+        System.out.println("Produto no estoque: " + estoque.consultarProduto("Café Espresso"));
+        estoque.atualizarEstoqueProduto("Bolo de Cenoura", -5);
+        System.out.println("Estoque do Bolo de Cenoura após atualização: " +
+                estoque.consultarProduto("Bolo de Cenoura").getQuantidadeEstoque());
+        System.out.println();
+
+        // --- Teste Cafeteria ---
+        System.out.println("6. TESTE DA CLASSE CAFETERIA");
+        Cafeteria cafeteria = new Cafeteria(50);
+        cafeteria.diminuirCafe(10);
+        System.out.println("Cafeteria após consumo de 10 cafés: " + cafeteria);
+        cafeteria.diminuirCafe(50); // Deve avisar sobre quantidade insuficiente
+        System.out.println();
+
+        // --- Teste DescontoCaneca ---
+        System.out.println("7. TESTE DA CLASSE DESCONTOCANECA");
+        DescontoCaneca descontoCaneca = new DescontoCaneca(15); // 15% de desconto
+        double precoComDesconto = descontoCaneca.calcularDesconto(cafe.getPrecoVenda());
+        System.out.printf("Preço do Café Espresso com desconto de 15%%: R$ %.2f\n", precoComDesconto);
+    }
+}
