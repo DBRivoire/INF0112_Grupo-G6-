@@ -1,0 +1,131 @@
+package Testes;
+
+import service.RelatorioVendas;
+import model.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+
+public class teste_RelatorioVendas {
+
+    private Produto produto1;
+    private Produto produto2;
+    private Venda venda1;
+    private ItemVenda itemVenda1;
+    private ItemVenda itemVenda2;
+    private Date dataInicio;
+    private Date dataFim;
+    private RelatorioVendas relatorio;
+
+    @BeforeEach
+    public void setUp() {
+        // Inicializa os objetos antes de cada teste
+        produto1 = new Produto("Produto A", 10.0, 20.0, 100);
+        produto2 = new Produto("Produto B", 15.0, 25.0, 50);
+
+        itemVenda1 = new ItemVenda(produto1, 2);
+        itemVenda2 = new ItemVenda(produto2, 3);
+
+        List<ItemVenda> itensVenda1 = new ArrayList<>();
+        itensVenda1.add(itemVenda1);
+
+        List<ItemVenda> itensVenda2 = new ArrayList<>();
+        itensVenda2.add(itemVenda2);
+
+        venda1 = new Venda(1, new Date(2023, 10, 20));
+        venda1.adicionarItem(itemVenda1);
+
+        Venda venda2 = new Venda(2, new Date(2023, 10, 21));
+        venda2.adicionarItem(itemVenda2);
+
+        // Define o período do relatório
+        dataInicio = new Date(2023, 10, 19);
+        dataFim = new Date(2023, 10, 22);
+
+        List<Venda> vendas = new ArrayList<>();
+        vendas.add(venda1);
+        vendas.add(venda2);
+
+        relatorio = new RelatorioVendas(vendas, dataInicio, dataFim);
+    }
+
+    // Teste de geração do relatório
+    @Test
+    public void testGerarRelatorio() {
+        relatorio.gerarRelatorio();
+
+        assertNotNull(relatorio.getProdutoMaisVendido());
+        assertEquals(2, relatorio.getDiasMaisMovimento().size());
+        assertEquals(115.0, relatorio.getTotalVendas(), 0.01);
+    }
+
+    // Teste de exceção quando tentar criar ItemVenda com produto nulo
+    @Test
+    public void testItemVendaProdutoNulo() {
+        assertThrows(NullPointerException.class, () -> new ItemVenda(null, 2));
+    }
+
+    // Teste de exceção quando tentar criar ItemVenda com quantidade inválida
+    @Test
+    public void testItemVendaQuantidadeInvalida() {
+        assertThrows(IllegalArgumentException.class, () -> new ItemVenda(produto1, -1));
+    }
+
+    // Teste de exceção quando quantidade de ItemVenda é zero
+    @Test
+    public void testItemVendaQuantidadeZero() {
+        assertThrows(IllegalArgumentException.class, () -> new ItemVenda(produto1, 0));
+    }
+
+    // Teste de exceção ao tentar atualizar estoque com valor negativo
+    @Test
+    public void testAtualizarEstoqueComValorNegativo() {
+        assertThrows(IllegalArgumentException.class, () -> produto1.atualizarEstoque(-200));
+    }
+
+    // Teste de exceção ao tentar criar produto com preço de venda inválido
+    @Test
+    public void testProdutoPrecoVendaInvalido() {
+        assertThrows(IllegalArgumentException.class, () -> new Produto("Produto C", 10.0, -1.0, 20));
+    }
+
+    // Teste de exceção ao tentar criar produto com nome vazio
+    @Test
+    public void testProdutoNomeVazio() {
+        assertThrows(IllegalArgumentException.class, () -> new Produto("", 10.0, 20.0, 20));
+    }
+
+    // Teste para o cálculo de produto mais vendido
+    @Test
+    public void testProdutoMaisVendido() {
+        relatorio.gerarRelatorio();
+        assertEquals(produto2, relatorio.getProdutoMaisVendido());
+    }
+
+    // Teste para garantir que o relatório gera corretamente os dias com mais vendas
+    @Test
+    public void testDiasMaisMovimento() {
+        relatorio.gerarRelatorio();
+        assertEquals(2, relatorio.getDiasMaisMovimento().size());
+    }
+
+    // Teste de exceção ao tentar criar Produto com quantidade negativa em estoque
+    @Test
+    public void testProdutoQuantidadeEstoqueNegativa() {
+        assertThrows(IllegalArgumentException.class, () -> new Produto("Produto D", 10.0, 20.0, -1));
+    }
+
+    // Teste de exceção ao tentar atualizar preço de produto com valor inválido
+    @Test
+    public void testAtualizarPrecoProdutoInvalido() {
+        assertThrows(IllegalArgumentException.class, () -> produto1.atualizarPreco(-5.0));
+    }
+}
+
+
