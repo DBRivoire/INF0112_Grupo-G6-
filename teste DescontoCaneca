@@ -1,0 +1,74 @@
+package Testes;
+
+import service.DescontoCaneca;
+
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class testes_DescontoCaneca {
+
+    private DescontoCaneca descontoCaneca;
+
+    @BeforeEach
+    public void setUp() {
+        // Inicializa a classe DescontoCaneca com um desconto de 10%
+        descontoCaneca = new DescontoCaneca(10);
+    }
+
+    @Test
+    public void testCalcularDesconto_DescontoValido() {
+        // Testa se o cálculo do desconto funciona corretamente
+        double precoOriginal = 100.0;
+        double precoComDesconto = descontoCaneca.calcularDesconto(precoOriginal);
+        assertEquals(90.0, precoComDesconto, "O preço com 10% de desconto deve ser 90.");
+    }
+
+    @Test
+    public void testCalcularDesconto_DescontoZero() {
+        // Testa se o cálculo do desconto com desconto zero retorna o preço original
+        descontoCaneca.setDesconto(0);
+        double precoOriginal = 100.0;
+        double precoComDesconto = descontoCaneca.calcularDesconto(precoOriginal);
+        assertEquals(100.0, precoComDesconto, "O preço com 0% de desconto deve ser igual ao original.");
+    }
+
+    @Test
+    public void testCalcularDesconto_DescontoMaiorQueCem() {
+        // Testa se o desconto maior que 100% retorna um preço negativo
+        descontoCaneca.setDesconto(150);
+        double precoOriginal = 100.0;
+        double precoComDesconto = descontoCaneca.calcularDesconto(precoOriginal);
+        assertEquals(-50.0, precoComDesconto, "O preço com 150% de desconto deve ser -50.");
+    }
+
+    @Test
+    public void testCalcularDesconto_PrecoNegativo() {
+        // Testa se o cálculo com preço negativo retorna um valor correto (mesmo que irreal)
+        double precoOriginal = -100.0;
+        double precoComDesconto = descontoCaneca.calcularDesconto(precoOriginal);
+        assertEquals(-90.0, precoComDesconto, "O preço com 10% de desconto sobre -100 deve ser -90.");
+    }
+
+    @Test
+    public void testSetDesconto_DescontoNegativo() {
+        // Testa se é possível definir um desconto negativo
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            descontoCaneca.setDesconto(-10);
+        });
+        assertEquals("Desconto não pode ser negativo!", exception.getMessage(), "A exceção esperada não foi lançada para desconto negativo.");
+    }
+
+    @Test
+    public void testSetDesconto_DescontoMaiorQueCem() {
+        // Testa se é possível definir um desconto maior que 100%
+        descontoCaneca.setDesconto(200);
+        assertEquals(200, descontoCaneca.getDesconto(), "O desconto deveria ser definido como 200.");
+    }
+
+    @Test
+    public void testGetDesconto() {
+        // Testa se o getter de desconto retorna o valor correto
+        assertEquals(10, descontoCaneca.getDesconto(), "O desconto inicial deveria ser 10.");
+    }
+}
