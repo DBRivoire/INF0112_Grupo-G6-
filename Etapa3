@@ -89,6 +89,8 @@ public class Produto {
 
 }
 
+
+
 // ItemVenda
 
 package model;
@@ -139,6 +141,8 @@ package model;
 
     }
 
+
+
 // Venda
 
 package model;
@@ -148,9 +152,9 @@ import java.util.Date;
 import java.util.List;
 
 public class Venda {
-    private int idVenda; // Identificação única da venda
-    private Date dataVenda; // Data em que a venda foi realizada
-    private List<ItemVenda> itens; // Lista de itens vendidos
+    private final int idVenda; // Identificação única da venda
+    private final Date dataVenda; // Data em que a venda foi realizada
+    private final List<ItemVenda> itens; // Lista de itens vendidos
     private double totalVenda; // Total da venda (calculado dinamicamente)
 
     // Construtor
@@ -210,4 +214,60 @@ public class Venda {
 }
 
 
+
+//Combo promocional
+
+package model;
+
+import java.util.List;
+
+public class ComboPromocional {
+    private List<Produto> produtos; // Lista de produtos no combo
+    private double desconto; // Desconto aplicado ao combo (em %)
+
+    // Construtor
+    public ComboPromocional(List<Produto> produtos, double desconto) {
+        this.produtos = produtos;
+        this.desconto = desconto;
+    }
+
+    // Calcula o preço total do combo aplicando o desconto
+    public double calcularPrecoCombo() {
+        double precoTotal = 0.0;
+        for (Produto produto : produtos) {
+            precoTotal += produto.getPrecoVenda();
+        }
+        return precoTotal - (precoTotal * (desconto / 100));
+    }
+
+    // Getters e setters
+    public List<Produto> getProdutos() {
+        return produtos;
+    }
+
+    public void setProdutos(List<Produto> produtos) {
+        this.produtos = produtos;
+    }
+
+    public double getDesconto() {
+        return desconto;
+    }
+
+    public void setDesconto(double desconto) {
+        this.desconto = desconto;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder detalhes = new StringBuilder();
+        detalhes.append("Combo Promocional:\n");
+        for (Produto produto : produtos) {
+            detalhes.append("- ").append(produto.getNome()).append(": R$ ")
+                    .append(produto.getPrecoVenda()).append("\n");
+        }
+        detalhes.append("Desconto: ").append(desconto).append("%\n");
+        detalhes.append("Preço com desconto: R$ ").append(calcularPrecoCombo()).append("\n");
+        return detalhes.toString();
+    }
+}
 
