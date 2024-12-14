@@ -1,0 +1,77 @@
+package Testes;
+
+import service.Cafeteria;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class teste_Cafeteria {
+    private Cafeteria cafeteria;
+
+    @BeforeEach
+    public void setUp() {
+        // Inicializa a Cafeteria com uma quantidade inicial de 100 unidades de café
+        cafeteria = new Cafeteria(100);
+    }
+
+    @Test
+    public void testVerificarDisponibilidadeCafe_ComQuantidadeSuficiente() {
+        // Testa se a cafeteria tem café suficiente
+        assertTrue(cafeteria.verificarDisponibilidadeCafe(50), "Deveria ter café suficiente para 50 unidades.");
+    }
+
+    @Test
+    public void testVerificarDisponibilidadeCafe_ComQuantidadeInsuficiente() {
+        // Testa se a cafeteria não tem café suficiente
+        assertFalse(cafeteria.verificarDisponibilidadeCafe(150), "Não deveria ter café suficiente para 150 unidades.");
+    }
+
+    @Test
+    public void testDiminuirCafe_QuantidadeValida() {
+        // Testa se o café é diminuído corretamente
+        cafeteria.diminuirCafe(30);
+        assertEquals(70, cafeteria.getQuantidadeCafeDisponivel(), "A quantidade de café após a diminuição deveria ser 70.");
+    }
+
+    @Test
+    public void testDiminuirCafe_QuantidadeExcedente() {
+        // Testa se é lançado um erro ao tentar diminuir mais café do que o disponível
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            cafeteria.diminuirCafe(150);
+        });
+        assertEquals("Quantidade insuficiente de café em estoque!", exception.getMessage(), "A exceção deveria ser lançada quando tentar diminuir mais café do que o disponível.");
+    }
+
+    @Test
+    public void testDiminuirCafe_QuantidadeNegativa() {
+        // Testa se é lançado um erro ao tentar diminuir uma quantidade negativa de café
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            cafeteria.diminuirCafe(-10);
+        });
+        assertEquals("Quantidade de café para diminuir não pode ser negativa!", exception.getMessage(), "A exceção deveria ser lançada quando tentar diminuir uma quantidade negativa.");
+    }
+
+    @Test
+    public void testSetQuantidadeCafeDisponivel_ValorValido() {
+        // Testa se a quantidade de café é alterada corretamente
+        cafeteria.setQuantidadeCafeDisponivel(200);
+        assertEquals(200, cafeteria.getQuantidadeCafeDisponivel(), "A quantidade de café deveria ser 200.");
+    }
+
+    @Test
+    public void testSetQuantidadeCafeDisponivel_ValorNegativo() {
+        // Testa se é lançado um erro ao tentar definir uma quantidade negativa de café
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            cafeteria.setQuantidadeCafeDisponivel(-50);
+        });
+        assertEquals("Quantidade de café não pode ser negativa!", exception.getMessage(), "A exceção deveria ser lançada ao tentar definir uma quantidade negativa.");
+    }
+
+    @Test
+    public void testToString() {
+        // Testa se o método toString retorna a string correta
+        assertEquals("Cafeteria{quantidadeCafeDisponivel=100}", cafeteria.toString(), "A string do toString está incorreta.");
+    }
+}
+
+
