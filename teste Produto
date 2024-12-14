@@ -1,0 +1,140 @@
+package Testes;
+
+import model.Produto;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class teste_produto {
+
+    @Test
+    public void testCriacaoProdutoValido() {
+        // Testa a criação de um produto com valores válidos
+        Produto produto = new Produto("Café", 5.0, 10.0, 100);
+        assertEquals("Café", produto.getNome());
+        assertEquals(5.0, produto.getPrecoCusto());
+        assertEquals(10.0, produto.getPrecoVenda());
+        assertEquals(100, produto.getQuantidadeEstoque());
+    }
+
+    @Test
+    public void testCriacaoProdutoComNomeNulo() {
+        // Testa se a criação com nome nulo lança exceção
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new Produto(null, 5.0, 10.0, 50);
+        });
+        assertEquals("O nome do produto não pode ser vazio.", exception.getMessage());
+    }
+
+    @Test
+    public void testCriacaoProdutoComNomeVazio() {
+        // Testa se a criação com nome vazio lança exceção
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new Produto("   ", 5.0, 10.0, 50);
+        });
+        assertEquals("O nome do produto não pode ser vazio.", exception.getMessage());
+    }
+
+    @Test
+    public void testCriacaoProdutoComPrecoCustoNegativo() {
+        // Testa se preço de custo negativo lança exceção
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new Produto("Café", -1.0, 10.0, 50);
+        });
+        assertEquals("Os preços devem ser maiores que zero.", exception.getMessage());
+    }
+
+    @Test
+    public void testCriacaoProdutoComPrecoVendaZero() {
+        // Testa se preço de venda zero lança exceção
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new Produto("Café", 5.0, 0.0, 50);
+        });
+        assertEquals("Os preços devem ser maiores que zero.", exception.getMessage());
+    }
+
+    @Test
+    public void testCriacaoProdutoComEstoqueNegativo() {
+        // Testa se quantidade em estoque negativa lança exceção
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new Produto("Café", 5.0, 10.0, -10);
+        });
+        assertEquals("A quantidade em estoque não pode ser negativa.", exception.getMessage());
+    }
+
+    @Test
+    public void testAtualizarPrecoValido() {
+        // Testa a atualização do preço de venda com valor válido
+        Produto produto = new Produto("Café", 5.0, 10.0, 100);
+        produto.atualizarPreco(15.0);
+        assertEquals(15.0, produto.getPrecoVenda());
+    }
+
+    @Test
+    public void testAtualizarPrecoInvalido() {
+        // Testa a atualização do preço de venda com valor inválido
+        Produto produto = new Produto("Café", 5.0, 10.0, 100);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            produto.atualizarPreco(-5.0);
+        });
+        assertEquals("O preço deve ser maior que zero.", exception.getMessage());
+    }
+
+    @Test
+    public void testAtualizarEstoqueValido() {
+        // Testa a atualização do estoque com valores válidos
+        Produto produto = new Produto("Café", 5.0, 10.0, 100);
+        produto.atualizarEstoque(50);
+        assertEquals(150, produto.getQuantidadeEstoque());
+
+        produto.atualizarEstoque(-30);
+        assertEquals(120, produto.getQuantidadeEstoque());
+    }
+
+    @Test
+    public void testAtualizarEstoqueInvalido() {
+        // Testa a atualização do estoque com valor inválido (estoque negativo)
+        Produto produto = new Produto("Café", 5.0, 10.0, 10);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            produto.atualizarEstoque(-20);
+        });
+        assertEquals("Estoque insuficiente para essa operação.", exception.getMessage());
+    }
+
+    @Test
+    public void testSetNomeValido() {
+        // Testa a atualização do nome com valor válido
+        Produto produto = new Produto("Café", 5.0, 10.0, 100);
+        produto.setNome("Chá");
+        assertEquals("Chá", produto.getNome());
+    }
+
+    @Test
+    public void testSetNomeInvalido() {
+        // Testa a atualização do nome com valor inválido (null ou vazio)
+        Produto produto = new Produto("Café", 5.0, 10.0, 100);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            produto.setNome(null);
+        });
+        assertEquals("O nome do produto não pode ser vazio.", exception.getMessage());
+
+        exception = assertThrows(IllegalArgumentException.class, () -> {
+            produto.setNome("   ");
+        });
+        assertEquals("O nome do produto não pode ser vazio.", exception.getMessage());
+    }
+
+    @Test
+    public void testToStringProduto() {
+        // Testa o método toString
+        Produto produto = new Produto("Café", 5.0, 10.0, 100);
+        String expected = "Produto: Café\n" +
+                "Preço de Custo: R$ 5.0\n" +
+                "Preço de Venda: R$ 10.0\n" +
+                "Quantidade em Estoque: 100";
+        assertEquals(expected, produto.toString());
+    }
+}
