@@ -1,4 +1,4 @@
-package Application;
+package application;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -7,7 +7,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import model.*;
-import model.Produto;
 import service.*;
 
 import java.util.ArrayList;
@@ -60,9 +59,7 @@ public class MainApp_teste extends Application {
         Button exibirProdutosButton = new Button("Exibir Produtos");
         exibirProdutosButton.setOnAction(e -> estoque.listarProdutos());
 
-
         // Realizar Venda
-
         TextField nomeProdutoVendaField = new TextField();
         nomeProdutoVendaField.setPromptText("Nome do Produto");
 
@@ -72,22 +69,17 @@ public class MainApp_teste extends Application {
         Button realizarVendaButton = new Button("Realizar Venda");
         realizarVendaButton.setOnAction(e -> {
             try {
-                // Captura o nome do produto e a quantidade informados pelo usuário
                 String nomeProduto = nomeProdutoVendaField.getText();
                 int quantidadeVenda = Integer.parseInt(quantidadeVendaField.getText());
 
-                // Consulta o produto no estoque pelo nome
                 Produto produto = estoque.consultarProduto(nomeProduto);
 
-                // Verifica se o produto existe e se há quantidade suficiente
                 if (produto != null && produto.getQuantidadeEstoque() >= quantidadeVenda) {
-                    // Cria um ItemVenda e adiciona à lista de vendas
                     ItemVenda item = new ItemVenda(produto, quantidadeVenda);
-                    Venda venda = new Venda(vendas.size() + 1, new Date()); // Gera ID único baseado no tamanho da lista
+                    Venda venda = new Venda(vendas.size() + 1, new Date());
                     venda.adicionarItem(item);
                     vendas.add(venda);
 
-                    // Atualiza o estoque
                     produto.atualizarEstoque(-quantidadeVenda);
 
                     showAlert(Alert.AlertType.INFORMATION, "Venda Realizada", "Venda realizada com sucesso!");
@@ -103,12 +95,42 @@ public class MainApp_teste extends Application {
             }
         });
 
+        // Criar Combo Promocional
+        TextField produtosComboField = new TextField();
+        produtosComboField.setPromptText("Nomes dos produtos (separados por vírgula)");
+        TextField descontoComboField = new TextField();
+        descontoComboField.setPromptText("Desconto (%)");
+
+        Button criarComboButton = new Button("Criar Combo Promocional");
+        criarComboButton.setOnAction(e -> {
+            try {
+                String[] nomesProdutos = produtosComboField.getText().split(",");
+                double desconto = Double.parseDouble(descontoComboField.getText());
+
+                List<Produto> produtosCombo = new ArrayList<>();
+                for (String nome : nomesProdutos) {
+                    Produto produto = estoque.consultarProduto(nome.trim());
+                    if (produto != null) {
+                        produtosCombo.add(produto);
+                    } else {
+                        throw new Exception("Produto " + nome.trim() + " não encontrado.");
+                    }
+                }
+
+                ComboPromocional combo = new ComboPromocional(produtosCombo, desconto);
+                showAlert(Alert.AlertType.INFORMATION, "Combo Criado", combo.toString());
+            } catch (NumberFormatException ex) {
+                showAlert(Alert.AlertType.ERROR, "Erro", "Por favor, insira valores válidos para o desconto.");
+            } catch (Exception ex) {
+                showAlert(Alert.AlertType.ERROR, "Erro", ex.getMessage());
+            }
+        });
 
         // Layout de Relatório
         Button gerarRelatorioButton = new Button("Gerar Relatório");
         gerarRelatorioButton.setOnAction(e -> {
             try {
-                relatorio = new RelatorioVendas(vendas, new Date(), new Date()); // Período do relatório
+                relatorio = new RelatorioVendas(vendas, new Date(), new Date());
                 relatorio.gerarRelatorio();
                 showAlert(Alert.AlertType.INFORMATION, "Relatório Gerado", relatorio.toString());
             } catch (Exception ex) {
@@ -121,11 +143,12 @@ public class MainApp_teste extends Application {
                 new Text("Cadastro de Produtos"), nomeProdutoField, precoCustoField, precoVendaField, quantidadeField, adicionarProdutoButton,
                 exibirProdutosButton,
                 new Text("Realizar Venda"), nomeProdutoVendaField, quantidadeVendaField, realizarVendaButton,
+                new Text("Criar Combo Promocional"), produtosComboField, descontoComboField, criarComboButton,
                 gerarRelatorioButton
         );
 
         // Cena e exibição
-        Scene scene = new Scene(root, 400, 500);
+        Scene scene = new Scene(root, 400, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
