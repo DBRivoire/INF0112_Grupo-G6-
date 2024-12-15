@@ -126,13 +126,30 @@ public class MainApp_teste extends Application {
             }
         });
 
-        // Layout de Relatório
-        Button gerarRelatorioButton = new Button("Gerar Relatório");
-        gerarRelatorioButton.setOnAction(e -> {
+        // Aplicar Desconto em Caneca
+        TextField nomeCanecaField = new TextField();
+        nomeCanecaField.setPromptText("Nome do Produto (Caneca)");
+
+        TextField descontoCanecaField = new TextField();
+        descontoCanecaField.setPromptText("Desconto (%)");
+
+        Button aplicarDescontoCanecaButton = new Button("Aplicar Desconto na Caneca");
+        aplicarDescontoCanecaButton.setOnAction(e -> {
             try {
-                relatorio = new RelatorioVendas(vendas, new Date(), new Date());
-                relatorio.gerarRelatorio();
-                showAlert(Alert.AlertType.INFORMATION, "Relatório Gerado", relatorio.toString());
+                String nomeCaneca = nomeCanecaField.getText();
+                double desconto = Double.parseDouble(descontoCanecaField.getText());
+
+                Produto caneca = estoque.consultarProduto(nomeCaneca);
+                if (caneca != null) {
+                    DescontoCaneca descontoCaneca = new DescontoCaneca(desconto);
+                    double novoPreco = descontoCaneca.calcularDesconto(caneca.getPrecoVenda());
+                    showAlert(Alert.AlertType.INFORMATION, "Desconto Aplicado",
+                            "Novo preço da caneca " + nomeCaneca + ": R$ " + String.format("%.2f", novoPreco));
+                } else {
+                    throw new Exception("Caneca " + nomeCaneca + " não encontrada no estoque.");
+                }
+            } catch (NumberFormatException ex) {
+                showAlert(Alert.AlertType.ERROR, "Erro", "Por favor, insira valores válidos para o desconto.");
             } catch (Exception ex) {
                 showAlert(Alert.AlertType.ERROR, "Erro", ex.getMessage());
             }
@@ -144,11 +161,11 @@ public class MainApp_teste extends Application {
                 exibirProdutosButton,
                 new Text("Realizar Venda"), nomeProdutoVendaField, quantidadeVendaField, realizarVendaButton,
                 new Text("Criar Combo Promocional"), produtosComboField, descontoComboField, criarComboButton,
-                gerarRelatorioButton
+                new Text("Desconto para Canecas"), nomeCanecaField, descontoCanecaField, aplicarDescontoCanecaButton
         );
 
         // Cena e exibição
-        Scene scene = new Scene(root, 400, 600);
+        Scene scene = new Scene(root, 400, 700);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
