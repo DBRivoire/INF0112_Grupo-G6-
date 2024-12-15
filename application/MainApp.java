@@ -1,4 +1,4 @@
-package application;
+package Application;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -7,13 +7,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import model.*;
+import model.Produto;
 import service.*;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainApp extends Application {
+public class MainApp_teste extends Application {
 
     private Estoque estoque = new Estoque();
     private List<Venda> vendas = new ArrayList<>();
@@ -59,27 +60,49 @@ public class MainApp extends Application {
         Button exibirProdutosButton = new Button("Exibir Produtos");
         exibirProdutosButton.setOnAction(e -> estoque.listarProdutos());
 
-        // Layout de venda
+
+        // Realizar Venda
+
+        TextField nomeProdutoVendaField = new TextField();
+        nomeProdutoVendaField.setPromptText("Nome do Produto");
+
         TextField quantidadeVendaField = new TextField();
-        quantidadeVendaField.setPromptText("Quantidade de venda");
+        quantidadeVendaField.setPromptText("Quantidade de Venda");
 
         Button realizarVendaButton = new Button("Realizar Venda");
         realizarVendaButton.setOnAction(e -> {
             try {
-                Produto produto = estoque.consultarProduto("Produto Exemplo"); // O nome pode ser obtido de uma lista no futuro
+                // Captura o nome do produto e a quantidade informados pelo usuário
+                String nomeProduto = nomeProdutoVendaField.getText();
                 int quantidadeVenda = Integer.parseInt(quantidadeVendaField.getText());
 
-                if (estoque.consultarProduto(produto.getNome()) != null) {
+                // Consulta o produto no estoque pelo nome
+                Produto produto = estoque.consultarProduto(nomeProduto);
+
+                // Verifica se o produto existe e se há quantidade suficiente
+                if (produto != null && produto.getQuantidadeEstoque() >= quantidadeVenda) {
+                    // Cria um ItemVenda e adiciona à lista de vendas
                     ItemVenda item = new ItemVenda(produto, quantidadeVenda);
-                    Venda venda = new Venda(1, new Date()); // Aqui colocaria um ID de venda único e a data atual
+                    Venda venda = new Venda(vendas.size() + 1, new Date()); // Gera ID único baseado no tamanho da lista
                     venda.adicionarItem(item);
                     vendas.add(venda);
+
+                    // Atualiza o estoque
+                    produto.atualizarEstoque(-quantidadeVenda);
+
                     showAlert(Alert.AlertType.INFORMATION, "Venda Realizada", "Venda realizada com sucesso!");
+                } else if (produto == null) {
+                    showAlert(Alert.AlertType.ERROR, "Erro", "Produto não encontrado!");
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Erro", "Quantidade insuficiente em estoque!");
                 }
+            } catch (NumberFormatException ex) {
+                showAlert(Alert.AlertType.ERROR, "Erro", "Por favor, insira valores válidos para a quantidade!");
             } catch (Exception ex) {
                 showAlert(Alert.AlertType.ERROR, "Erro", ex.getMessage());
             }
         });
+
 
         // Layout de Relatório
         Button gerarRelatorioButton = new Button("Gerar Relatório");
@@ -97,7 +120,7 @@ public class MainApp extends Application {
         root.getChildren().addAll(
                 new Text("Cadastro de Produtos"), nomeProdutoField, precoCustoField, precoVendaField, quantidadeField, adicionarProdutoButton,
                 exibirProdutosButton,
-                new Text("Realizar Venda"), quantidadeVendaField, realizarVendaButton,
+                new Text("Realizar Venda"), nomeProdutoVendaField, quantidadeVendaField, realizarVendaButton,
                 gerarRelatorioButton
         );
 
