@@ -1,0 +1,45 @@
+package service;
+
+public class Cafeteria {
+    private int quantidadeCafeDisponivel; // Quantidade de café em estoque (em unidades)
+
+    // Construtor
+    public Cafeteria(int quantidadeInicial) {
+        this.quantidadeCafeDisponivel = quantidadeInicial;
+    }
+
+    // Verifica se há café suficiente disponível
+    public boolean verificarDisponibilidadeCafe(int quantidade) {
+        return quantidade <= quantidadeCafeDisponivel;
+    }
+
+    // Diminui a quantidade de café no estoque
+    public void diminuirCafe(int quantidade) {
+        if (quantidade < 0) {
+            throw new IllegalArgumentException("Quantidade de café para diminuir não pode ser negativa!");
+        }
+        if (quantidadeCafeDisponivel < quantidade) {
+            throw new IllegalArgumentException("Quantidade insuficiente de café em estoque!");
+        }
+        quantidadeCafeDisponivel -= quantidade;
+    }
+
+    // Getters e setters
+    public int getQuantidadeCafeDisponivel() {
+        return quantidadeCafeDisponivel;
+    }
+
+    public void setQuantidadeCafeDisponivel(int quantidadeCafeDisponivel) {
+        if (quantidadeCafeDisponivel < 0) {
+            throw new IllegalArgumentException("Quantidade de café não pode ser negativa!");
+        }
+        this.quantidadeCafeDisponivel = quantidadeCafeDisponivel;
+    }
+
+    @Override
+    public String toString() {
+        return "Cafeteria{" +
+                "quantidadeCafeDisponivel=" + quantidadeCafeDisponivel +
+                '}';
+    }
+}
