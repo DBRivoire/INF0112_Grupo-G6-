@@ -1,0 +1,85 @@
+package Testes;
+
+import model.ItemVenda;
+import model.Produto;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class teste_ItemVenda {
+
+    @Test
+    public void testCriacaoItemVenda() {
+        // Testa a criação de um item de venda válido
+        Produto produto = new Produto("Café", 10.0, 15.0, 100);
+        ItemVenda itemVenda = new ItemVenda(produto, 5);
+
+        assertEquals(produto, itemVenda.getProduto());
+        assertEquals(5, itemVenda.getQuantidade());
+    }
+
+
+    @Test
+    public void testCriacaoItemVendaComProdutoNulo() {
+        // Verifica o comportamento ao criar um ItemVenda com produto nulo
+        Exception exception = assertThrows(NullPointerException.class, () -> {
+            new ItemVenda(null, 5);
+        });
+        assertEquals("Produto não pode ser nulo", exception.getMessage());
+    }
+
+    @Test
+    public void testCriacaoItemVendaComQuantidadeNegativa() {
+        // Verifica a criação de um ItemVenda com quantidade negativa
+        Produto produto = new Produto("Café", 10.0, 15.0, 100);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new ItemVenda(produto, -3);
+        });
+        assertEquals("Quantidade deve ser maior que zero.", exception.getMessage());
+    }
+
+
+    @Test
+    public void testCalcularTotalItemVenda() {
+        // Testa se o cálculo total do item está correto
+        Produto produto = new Produto("Café", 10.0, 20.0, 100);
+        ItemVenda itemVenda = new ItemVenda(produto, 3);
+
+        double totalEsperado = 20.0 * 3; // Preço de venda * quantidade
+        assertEquals(totalEsperado, itemVenda.calcularTotal());
+    }
+
+    @Test
+    public void testSetQuantidadeValida() {
+        // Testa a atualização da quantidade de um item de venda
+        Produto produto = new Produto("Café", 10.0, 15.0, 100);
+        ItemVenda itemVenda = new ItemVenda(produto, 5);
+
+        itemVenda.setQuantidade(10);
+        assertEquals(10, itemVenda.getQuantidade());
+    }
+
+    @Test
+    public void testSetProdutoValido() {
+        // Testa a atualização do produto no item de venda
+        Produto produto1 = new Produto("Café", 10.0, 15.0, 100);
+        Produto produto2 = new Produto("Chá", 8.0, 12.0, 50);
+
+        ItemVenda itemVenda = new ItemVenda(produto1, 5);
+        itemVenda.setProduto(produto2);
+
+        assertEquals(produto2, itemVenda.getProduto());
+    }
+
+    @Test
+    public void testToStringItemVenda() {
+        // Testa a representação do item de venda como String
+        Produto produto = new Produto("Café", 10.0, 15.0, 100);
+        ItemVenda itemVenda = new ItemVenda(produto, 2);
+
+        String expected = "ItemVenda{produto=Café, quantidade=2, total=R$ 30.0}";
+        assertEquals(expected, itemVenda.toString());
+    }
+}
+
