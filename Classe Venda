@@ -18,19 +18,38 @@ public class Venda {
         this.totalVenda = 0.0;
     }
 
-    // Adiciona um item à lista de itens da venda
     public void adicionarItem(ItemVenda item) {
+        if (item == null) {
+            throw new IllegalArgumentException("Item de venda não pode ser nulo.");
+        }
         itens.add(item);
-        calcularTotalVenda(); // Recalcula o total da venda sempre que um item é adicionado
+        calcularTotalVenda(); // Atualiza o total da venda
     }
 
-    // Calcula o total da venda somando os totais de todos os itens
-    private void calcularTotalVenda() {
-        totalVenda = 0.0;
+
+    public void calcularTotalVenda() {
+        totalVenda = 0.0; // Reseta o total antes de somar
         for (ItemVenda item : itens) {
             totalVenda += item.calcularTotal();
         }
     }
+
+
+
+    //modidicação!!!
+    public double calcularTotalVenda(Date dataInicio, Date dataFim) {
+        double totalVendasNoPeriodo = 0.0;
+
+        if (!dataVenda.before(dataInicio) && !dataVenda.after(dataFim)) {
+            for (ItemVenda item : itens) {
+                totalVendasNoPeriodo += item.calcularTotal();
+            }
+        }
+        return totalVendasNoPeriodo;
+    }
+
+
+
 
     // Getters
     public int getIdVenda() {
@@ -65,3 +84,4 @@ public class Venda {
         return detalhes.toString();
     }
 }
+
