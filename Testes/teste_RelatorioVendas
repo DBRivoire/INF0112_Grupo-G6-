@@ -1,0 +1,116 @@
+package Testes;
+
+import service.RelatorioVendas2;
+import model.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class teste_RelatorioVendas {
+
+
+    private Produto produto1;
+    private Produto produto2;
+    private Produto produto3;
+    private Venda venda1;
+    private Venda venda2;
+    private Venda venda3;
+    private RelatorioVendas2 relatorioVendas;
+
+    @BeforeEach
+    void setUp() {
+        produto1 = new Produto("Produto A", 10.0, 15.0, 100);
+        produto2 = new Produto("Produto B", 5.0, 8.0, 50);
+        produto3 = new Produto("Produto C", 20.0, 30.0, 30);
+
+        venda1 = new Venda(1, new Date());
+        venda2 = new Venda(2, new Date());
+        venda3 = new Venda(3, new Date());
+
+        ItemVenda itemVenda1 = new ItemVenda(produto1, 10);
+        ItemVenda itemVenda2 = new ItemVenda(produto2, 5);
+        ItemVenda itemVenda3 = new ItemVenda(produto3, 2);
+
+        venda1.adicionarItem(itemVenda1);
+        venda2.adicionarItem(itemVenda2);
+        venda3.adicionarItem(itemVenda3);
+
+        List<Venda> vendas = Arrays.asList(venda1, venda2, venda3);
+        relatorioVendas = new RelatorioVendas2(vendas, new Date(System.currentTimeMillis() - 86400000), new Date()); // Últimas 24 horas
+    }
+
+    @Test
+    void testCalcularProdutoMaisVendido() {
+        Produto produtoMaisVendido = relatorioVendas.calcularProdutoMaisVendido();
+        assertEquals(produto1, produtoMaisVendido, "O produto mais vendido deve ser o Produto A");
+    }
+
+    @Test
+    void testCalcularDiasMaisMovimento() {
+        List<Date> diasMaisMovimento = relatorioVendas.calcularDiasMaisMovimento();
+        assertNotNull(diasMaisMovimento, "A lista de dias com maior movimento não pode ser nula");
+        assertTrue(diasMaisMovimento.size() > 0, "A lista de dias com maior movimento deve ter pelo menos um dia");
+    }
+
+    @Test
+    void testGerarRelatorio() {
+        // Esse teste irá apenas verificar se o método 'gerarRelatorio' não gera erros.
+        // Como ele imprime no console, não há uma verificação direta do conteúdo.
+        assertDoesNotThrow(() -> relatorioVendas.gerarRelatorio(), "O método gerarRelatorio deve rodar sem erros");
+    }
+
+    @Test
+    void testProdutoMaisVendidoComVendasVazias() {
+        List<Venda> vendasVazias = new ArrayList<>();
+        RelatorioVendas2 relatorioVendasVazias = new RelatorioVendas2(vendasVazias, new Date(System.currentTimeMillis() - 86400000), new Date());
+
+        Produto produtoMaisVendido = relatorioVendasVazias.calcularProdutoMaisVendido();
+        assertNull(produtoMaisVendido, "Se não houver vendas, o produto mais vendido deve ser nulo");
+    }
+
+    @Test
+    void testDiasMaisMovimentoComVendasVazias() {
+        List<Venda> vendasVazias = new ArrayList<>();
+        RelatorioVendas2 relatorioVendasVazias = new RelatorioVendas2(vendasVazias, new Date(System.currentTimeMillis() - 86400000), new Date());
+
+        List<Date> diasMaisMovimento = relatorioVendasVazias.calcularDiasMaisMovimento();
+        assertTrue(diasMaisMovimento.isEmpty(), "Se não houver vendas, a lista de dias com maior movimento deve estar vazia");
+    }
+
+    @Test
+    void testCalcularProdutoMaisVendidoNoPeriodo() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, -1); // Venda de ontem
+        Date dataInicio = calendar.getTime();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        Date dataFim = calendar.getTime();
+
+        relatorioVendas.setDataInicio(dataInicio);
+        relatorioVendas.setDataFim(dataFim);
+
+        Produto produtoMaisVendido = relatorioVendas.calcularProdutoMaisVendido();
+        assertEquals(produto1, produtoMaisVendido, "Produto mais vendido no período deve ser o Produto A");
+    }
+
+    @Test
+    void testRelatorioComProdutosDiferentes() {
+        Produto produto4 = new Produto("Produto D", 50.0, 100.0, 25);
+        Produto produto5 = new Produto("Produto E", 30.0, 60.0, 15);
+        Venda venda4 = new Venda(4, new Date());
+        ItemVenda itemVenda4 = new ItemVenda(produto4, 8);
+        venda4.adicionarItem(itemVenda4);
+
+        Venda venda5 = new Venda(5, new Date());
+        ItemVenda itemVenda5 = new ItemVenda(produto5, 3);
+        venda5.adicionarItem(itemVenda5);
+
+        List<Venda> vendasDiferentesProdutos = Arrays.asList(venda1, venda4, venda5);
+
+        RelatorioVendas2 relatorioVendasDiferentesProdutos = new RelatorioVendas2(vendasDiferentesProdutos, new Date(System.currentTimeMillis() - 86400000), new Date());
+        Produto produtoMaisVendido = relatorioVendasDiferentesProdutos.calcularProdutoMaisVendido();
+        assertEquals(produto1, produtoMaisVendido, "Produto mais vendido deve ser o Produto A");
+    }
+}
