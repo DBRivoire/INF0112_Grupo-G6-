@@ -1,0 +1,200 @@
+package service;
+
+import model.ItemVenda;
+import model.Venda;
+import model.Produto;
+import java.util.Calendar;
+
+import java.util.*;
+
+public class RelatorioVendas {
+    // Atributos
+    private List<Venda> vendas;              // Lista de vendas realizadas
+    private Date dataInicio;                 // Data inicial do período analisado
+    private Date dataFim;                    // Data final do período analisado
+    private Produto produtoMaisVendido;      // Produto mais vendido no período
+    private List<Date> diasMaisMovimento;    // Dias com maior movimento de vendas
+
+
+
+    // Construtor
+    public RelatorioVendas(List<Venda> vendas, Date dataInicio, Date dataFim) {
+        this.vendas = vendas;
+        this.dataInicio = dataInicio;
+        this.dataFim = dataFim;
+        this.produtoMaisVendido = null;
+        this.diasMaisMovimento = new ArrayList<>();
+    }
+
+    // Método para gerar o relatório
+    public String gerarRelatorio() {
+        this.produtoMaisVendido = calcularProdutoMaisVendido();
+        this.diasMaisMovimento = calcularDiasMaisMovimento();
+
+        System.out.println("===== Relatório de Vendas =====");
+        System.out.println("Período: " + dataInicio + " a " + dataFim);
+        System.out.println("Produto mais vendido: " + (produtoMaisVendido != null ? produtoMaisVendido.getNome() : "Nenhum produto"));
+        System.out.println("Dias de maior movimento: " + diasMaisMovimento);
+        System.out.println("================================");
+        return null;
+    }
+
+
+    // Método para calcular o produto mais vendido no período
+    public Produto calcularProdutoMaisVendido() {
+        Map<Produto, Integer> quantidadeVendidaPorProduto = new HashMap<Produto, Integer>();
+
+        for (Venda venda : vendas) {
+            // Comparação de datas sem considerar a hora
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(venda.getDataVenda());
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            Date dataVendaSemHora = calendar.getTime();
+
+            Calendar calendarInicio = Calendar.getInstance();
+            calendarInicio.setTime(dataInicio);
+            calendarInicio.set(Calendar.HOUR_OF_DAY, 0);
+            calendarInicio.set(Calendar.MINUTE, 0);
+            calendarInicio.set(Calendar.SECOND, 0);
+            calendarInicio.set(Calendar.MILLISECOND, 0);
+            Date dataInicioSemHora = calendarInicio.getTime();
+
+            Calendar calendarFim = Calendar.getInstance();
+            calendarFim.setTime(dataFim);
+            calendarFim.set(Calendar.HOUR_OF_DAY, 0);
+            calendarFim.set(Calendar.MINUTE, 0);
+            calendarFim.set(Calendar.SECOND, 0);
+            calendarFim.set(Calendar.MILLISECOND, 0);
+            Date dataFimSemHora = calendarFim.getTime();
+
+            // Comparar as datas sem hora
+            if (!dataVendaSemHora.before(dataInicioSemHora) && !dataVendaSemHora.after(dataFimSemHora)) {
+                for (ItemVenda item : venda.getItens()) {
+                    Produto produto = item.getProduto();
+                    int quantidade = item.getQuantidade();
+                    quantidadeVendidaPorProduto.put(produto, quantidadeVendidaPorProduto.getOrDefault(produto, 0) + quantidade);
+                }
+            }
+        }
+
+        // Encontrar o produto com maior quantidade vendida
+        Produto maisVendido = null;
+        int maiorQuantidade = 0;
+        for (Map.Entry<Produto, Integer> entry : quantidadeVendidaPorProduto.entrySet()) {
+            if (entry.getValue() > maiorQuantidade) {
+                maisVendido = entry.getKey();
+                maiorQuantidade = entry.getValue();
+            }
+        }
+
+        return maisVendido;
+    }
+
+
+    // Método para calcular os dias com maior movimento de vendas
+    public List<Date> calcularDiasMaisMovimento() {
+        Map<Date, Double> totalVendasPorDia = new HashMap<>();
+
+        for (Venda venda : vendas) {
+            // Comparação de datas sem considerar a hora
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(venda.getDataVenda());
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            Date dataVendaSemHora = calendar.getTime();
+
+            Calendar calendarInicio = Calendar.getInstance();
+            calendarInicio.setTime(dataInicio);
+            calendarInicio.set(Calendar.HOUR_OF_DAY, 0);
+            calendarInicio.set(Calendar.MINUTE, 0);
+            calendarInicio.set(Calendar.SECOND, 0);
+            calendarInicio.set(Calendar.MILLISECOND, 0);
+            Date dataInicioSemHora = calendarInicio.getTime();
+
+            Calendar calendarFim = Calendar.getInstance();
+            calendarFim.setTime(dataFim);
+            calendarFim.set(Calendar.HOUR_OF_DAY, 0);
+            calendarFim.set(Calendar.MINUTE, 0);
+            calendarFim.set(Calendar.SECOND, 0);
+            calendarFim.set(Calendar.MILLISECOND, 0);
+            Date dataFimSemHora = calendarFim.getTime();
+
+            // Comparar as datas sem hora
+            if (!dataVendaSemHora.before(dataInicioSemHora) && !dataVendaSemHora.after(dataFimSemHora)) {
+                Date dataVenda = venda.getDataVenda();
+                double totalVenda = venda.getTotalVenda();
+
+                totalVendasPorDia.put(dataVenda, totalVendasPorDia.getOrDefault(dataVenda, 0.0) + totalVenda);
+            }
+        }
+
+        // Encontrar o(s) dia(s) com maior total de vendas
+        List<Date> diasComMaiorMovimento = new ArrayList<>();
+        double maiorTotal = 0.0;
+
+        for (Map.Entry<Date, Double> entry : totalVendasPorDia.entrySet()) {
+            if (entry.getValue() > maiorTotal) {
+                maiorTotal = entry.getValue();
+                diasComMaiorMovimento.clear();
+                diasComMaiorMovimento.add(entry.getKey());
+            } else if (entry.getValue() == maiorTotal) {
+                diasComMaiorMovimento.add(entry.getKey());
+            }
+        }
+
+        return diasComMaiorMovimento;
+    }
+
+
+    // Getters e Setters
+    public List<Venda> getVendas() {
+        return vendas;
+    }
+
+    public void setVendas(List<Venda> vendas) {
+        this.vendas = vendas;
+    }
+
+    public Date getDataInicio() {
+        return dataInicio;
+    }
+
+    public void setDataInicio(Date dataInicio) {
+        this.dataInicio = dataInicio;
+    }
+
+    public Date getDataFim() {
+        return dataFim;
+    }
+
+    public void setDataFim(Date dataFim) {
+        this.dataFim = dataFim;
+    }
+
+    public Produto getProdutoMaisVendido() {
+        return produtoMaisVendido;
+    }
+
+    public List<Date> getDiasMaisMovimento() {
+        return diasMaisMovimento;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("===== Relatório de Vendas =====\n");
+        sb.append("Período: ").append(dataInicio).append(" a ").append(dataFim).append("\n");
+        sb.append("Produto mais vendido: ").append(produtoMaisVendido != null ? produtoMaisVendido.getNome() : "Nenhum produto").append("\n");
+        sb.append("Dias de maior movimento: ").append(diasMaisMovimento).append("\n");
+        sb.append("================================\n");
+        return sb.toString();
+    }
+
+
+
+}
