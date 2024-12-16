@@ -1,0 +1,103 @@
+package Testes;
+
+import service.Estoque;
+import model.Produto;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class teste_Estoque {
+
+
+    private Estoque estoque;
+    private Produto produto;
+
+    @BeforeEach
+    public void setUp() {
+        estoque = new Estoque();
+        produto = new Produto("Produto A", 10.0, 15.0, 100);
+    }
+
+    @Test
+    public void testAdicionarProduto_ProdutoValido() {
+        estoque.adicionarProduto(produto);
+        assertEquals(produto, estoque.consultarProduto(produto.getNome()), "Produto não foi adicionado corretamente ao estoque.");
+    }
+
+    @Test
+    public void testAdicionarProduto_ProdutoJaExiste() {
+        estoque.adicionarProduto(produto);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            estoque.adicionarProduto(produto); // Tentando adicionar o mesmo produto novamente
+        });
+        assertEquals("Produto já existe no estoque!", exception.getMessage(), "A exceção esperada não foi lançada para produto já existente.");
+    }
+
+    @Test
+    public void testRemoverProduto_ProdutoExistente() {
+        estoque.adicionarProduto(produto);
+        estoque.removerProduto(produto.getNome());
+        assertNull(estoque.consultarProduto(produto.getNome()), "Produto não foi removido corretamente do estoque.");
+    }
+
+    @Test
+    public void testRemoverProduto_ProdutoNaoExistente() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            estoque.removerProduto("Produto Inexistente");
+        });
+        assertEquals("Produto não encontrado no estoque!", exception.getMessage(), "A exceção esperada não foi lançada para produto não existente.");
+    }
+
+    @Test
+    public void testAtualizarEstoqueProduto_ProdutoExistente_QuantidadeValida() {
+        estoque.adicionarProduto(produto);
+        estoque.atualizarEstoqueProduto(produto.getNome(), 50); // Aumentando o estoque
+        assertEquals(150, produto.getQuantidadeEstoque(), "Estoque do produto não foi atualizado corretamente.");
+    }
+
+    @Test
+    public void testAtualizarEstoqueProduto_ProdutoExistente_QuantidadeNegativa() {
+        estoque.adicionarProduto(produto);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            estoque.atualizarEstoqueProduto(produto.getNome(), -200); // Tentando remover mais do que o estoque disponível
+        });
+        assertEquals("Estoque insuficiente para essa operação.", exception.getMessage(), "A exceção esperada não foi lançada para quantidade negativa.");
+    }
+
+    @Test
+    public void testAtualizarEstoqueProduto_ProdutoNaoExistente() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            estoque.atualizarEstoqueProduto("Produto Inexistente", 50);
+        });
+        assertEquals("Produto não encontrado no estoque!", exception.getMessage(), "A exceção esperada não foi lançada para produto não existente.");
+    }
+
+    @Test
+    public void testConsultarProduto_ProdutoExistente() {
+        estoque.adicionarProduto(produto);
+        Produto produtoConsultado = estoque.consultarProduto(produto.getNome());
+        assertNotNull(produtoConsultado, "Produto não encontrado no estoque.");
+        assertEquals(produto, produtoConsultado, "Produto retornado não é o esperado.");
+    }
+
+    @Test
+    public void testConsultarProduto_ProdutoNaoExistente() {
+        Produto produtoConsultado = estoque.consultarProduto("Produto Inexistente");
+        assertNull(produtoConsultado, "Produto que não existe foi encontrado no estoque.");
+    }
+
+    @Test
+    public void testListarProdutos_EstoqueVazio() {
+        estoque.listarProdutos();
+        // A saída no console pode ser verificada manualmente, ou pode-se usar System.setOut para capturar a saída e verificar com assert
+        // Exemplo: capturar a saída do console e verificar se "Estoque vazio!" foi impresso
+    }
+
+    @Test
+    public void testListarProdutos_EstoqueComProduto() {
+        estoque.adicionarProduto(produto);
+        estoque.listarProdutos();
+        // Verificar manualmente a impressão da listagem no console
+    }
+}
+
