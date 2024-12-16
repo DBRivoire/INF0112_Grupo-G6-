@@ -1,0 +1,149 @@
+package Testes;
+
+import model.Venda;
+import model.ItemVenda;
+import model.Produto;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Date;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class teste_venda {
+    private Venda venda;
+    private Produto produto1;
+    private Produto produto2;
+
+    @BeforeEach
+    public void setUp() {
+        // Cria uma venda com ID 1 e a data atual
+        venda = new Venda(1, new Date());
+
+        // Cria dois produtos
+        produto1 = new Produto("Café", 10.0, 15.0, 100);
+        produto2 = new Produto("Leite", 5.0, 8.0, 50);
+    }
+
+    // Testa a criação de uma venda
+    @Test
+    public void testCriacaoVenda() {
+        assertEquals(1, venda.getIdVenda());
+        assertNotNull(venda.getDataVenda());
+        assertTrue(venda.getItens().isEmpty());
+        assertEquals(0.0, venda.getTotalVenda());
+    }
+
+    @Test
+    public void testAdicionarItem() {
+        Produto produto1 = new Produto("Café", 10.0, 15.0, 10);
+        Venda venda = new Venda(1, new Date());
+
+        ItemVenda item1 = new ItemVenda(produto1, 2); // 2 unidades de "Café"
+        venda.adicionarItem(item1);
+
+        assertEquals(1, venda.getItens().size()); // Verifica se o item foi adicionado corretamente
+        assertEquals(30.0, venda.getTotalVenda(), 0.001); // 2 * 15.0 = 30.0
+    }
+
+
+    // Testa a adição de múltiplos itens
+    @Test
+    public void testAdicionarMultiplosItens() {
+        Produto produto1 = new Produto("Café", 10.0, 15.0, 10);
+        Produto produto2 = new Produto("Leite", 5.0, 8.0, 20);
+        Venda venda = new Venda(1, new Date());
+
+        ItemVenda item1 = new ItemVenda(produto1, 2); // 2 unidades de "Café"
+        ItemVenda item2 = new ItemVenda(produto2, 3); // 3 unidades de "Leite"
+
+        venda.adicionarItem(item1);
+        venda.adicionarItem(item2);
+
+        assertEquals(2, venda.getItens().size()); // Verifica se os itens foram adicionados
+        assertEquals(54.0, venda.getTotalVenda(), 0.001); // (2 * 15.0) + (3 * 8.0) = 54.0
+    }
+
+
+    // Testa a exceção ao criar um ItemVenda com quantidade negativa
+    @Test
+    public void testCriarItemComQuantidadeNegativa() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new ItemVenda(produto1, -1),
+                "Quantidade deve ser maior que zero.");
+    }
+
+
+    // Testa a exceção ao criar um ItemVenda com produto nulo
+    @Test
+    public void testCriarItemComProdutoNulo() {
+        assertThrows(NullPointerException.class,
+                () -> new ItemVenda(null, 2),
+                "Produto não pode ser nulo.");
+    }
+
+    // Testa o metodo toString
+    @Test
+    public void testToString() {
+        Produto produto1 = new Produto("Café", 10.0, 15.0, 10);
+        Venda venda = new Venda(1, new Date());
+
+        ItemVenda item1 = new ItemVenda(produto1, 2); // 2 unidades de "Café"
+        venda.adicionarItem(item1);
+
+        String expected = "Venda ID: 1\n" +
+                "Data: " + venda.getDataVenda() + "\n" +
+                "Itens Vendidos:\n" +
+                "ItemVenda{produto=Café, quantidade=2, total=R$ 30.0}\n" +
+                "Total da Venda: R$ 30.0";
+
+        assertEquals(expected, venda.toString());
+    }
+
+
+    // Testa a exceção ao criar um ItemVenda com quantidade zero
+    @Test
+    public void testCriarItemComQuantidadeZero() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new ItemVenda(produto1, 0),
+                "Quantidade deve ser maior que zero.");
+    }
+
+
+
+    // Testa a exceção ao tentar criar um produto com nome vazio
+    @Test
+    public void testCriarProdutoComNomeVazio() {
+        assertThrows(IllegalArgumentException.class, () -> new Produto("", 10.0, 15.0, 100),
+                "O nome do produto não pode ser vazio.");
+    }
+
+    // Testa a exceção ao tentar criar um produto com preço inválido
+    @Test
+    public void testCriarProdutoComPrecoInvalido() {
+        assertThrows(IllegalArgumentException.class, () -> new Produto("Produto", -10.0, 15.0, 100),
+                "Os preços devem ser maiores que zero.");
+    }
+
+    // Testa a exceção ao tentar criar um produto com quantidade em estoque negativa
+    @Test
+    public void testCriarProdutoComEstoqueNegativo() {
+        assertThrows(IllegalArgumentException.class, () -> new Produto("Produto", 10.0, 15.0, -1),
+                "A quantidade em estoque não pode ser negativa.");
+    }
+
+    // Testa a exceção ao tentar atualizar o preço de um produto com preço inválido
+    @Test
+    public void testAtualizarPrecoProdutoInvalido() {
+        assertThrows(IllegalArgumentException.class, () -> produto1.atualizarPreco(-5.0),
+                "O preço deve ser maior que zero.");
+    }
+
+    // Testa a exceção ao tentar atualizar o estoque de um produto com quantidade insuficiente
+    @Test
+    public void testAtualizarEstoqueProdutoInvalido() {
+        produto1.atualizarEstoque(10);
+        assertThrows(IllegalArgumentException.class, () -> produto1.atualizarEstoque(-200),
+                "Estoque insuficiente para essa operação.");
+    }
+}
