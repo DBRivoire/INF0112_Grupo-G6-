@@ -113,7 +113,6 @@ A interface foi desenvolvida usando **JavaFX** para permitir a interação do us
 
 ## Capturas de Tela
 
-*(Insira aqui screenshots da interface da aplicação)*
 
 ---
 
